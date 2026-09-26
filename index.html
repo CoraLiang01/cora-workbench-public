@@ -538,13 +538,7 @@ function ico(name, s){
   return `<svg class="ico" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round">${d[name]||d.file}</svg>`;
 }
 function projectIco(p, size){
-  const byTitle = {
-    '优化笔记':'chart','健康课题':'heart','排程研究':'calendar','方法笔记':'git',
-    '文献清单':'grid','案例研究':'refresh','时间轴':'clock',
-    '例会记录':'users','工具笔记':'book','简历草稿':'idcard','备课笔记':'grad',
-    '成长记录':'sprout','音乐':'music','阅读':'chat','运动':'dumbbell',
-    '舞蹈':'spark','户外':'waves'
-  };
+  const byTitle = { '方法笔记':'git' };
   const byCat = {Research:'diamond', Personal:'users', Learning:'grad', Interest:'music'};
   return ico(byTitle[p && p.title] || byCat[p && p.category] || 'file', size||22);
 }
@@ -1289,30 +1283,18 @@ async function resolveFileUrl(file){
   return await idbGetFile(file.id);
 }
 
+function methodNoteProject(){
+  return {id:uid(), title:'方法笔记', category:'Research', icon:'◇', content:'# 方法笔记\n\n在这里写笔记。行内公式：$x-2$。\n\n$$\\max_x\\ c^{\\top}x$$\n', createdAt:todayStr(), updatedAt:todayStr(), pages:[]};
+}
 function initDefaultProjects(){
-  const projects = load('projects', []);
-  if(!projects.length){
-    const defaults = [
-      {id:uid(), title:'优化笔记', category:'Research', icon:'◇', content:'# 优化笔记\n\n在这里像 Notion 一样写笔记。行内公式：$x-2$。\n\n$$\\max_x\\ c^{\\top}x$$\n', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'健康课题', category:'Research', icon:'◇', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'排程研究', category:'Research', icon:'◇', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'方法笔记', category:'Research', icon:'◇', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'文献清单', category:'Research', icon:'◇', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'案例研究', category:'Research', icon:'◇', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'时间轴', category:'Personal', icon:'○', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'例会记录', category:'Personal', icon:'○', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'工具笔记', category:'Personal', icon:'○', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'简历草稿', category:'Learning', icon:'△', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'备课笔记', category:'Learning', icon:'△', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'成长记录', category:'Learning', icon:'△', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'音乐', category:'Interest', icon:'☆', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'阅读', category:'Interest', icon:'☆', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'运动', category:'Interest', icon:'☆', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'舞蹈', category:'Interest', icon:'☆', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]},
-      {id:uid(), title:'户外', category:'Interest', icon:'☆', content:'', createdAt:todayStr(), updatedAt:todayStr(), pages:[]}
-    ];
+  const sampleTitles = new Set(['优化笔记','健康课题','排程研究','方法笔记','文献清单','案例研究','时间轴','例会记录','工具笔记','简历草稿','备课笔记','成长记录','音乐','阅读','运动','舞蹈','户外']);
+  let projects = load('projects', []);
+  const onlySamples = !projects.length || projects.every(p => sampleTitles.has(p.title));
+  if(onlySamples && (projects.length !== 1 || projects[0].title !== '方法笔记')){
+    const keep = projects.find(p => p.title === '方法笔记');
+    projects = keep ? [keep] : [methodNoteProject()];
     cloudQuiet = true;
-    localStorage.setItem(P+'projects', JSON.stringify(defaults));
+    localStorage.setItem(P+'projects', JSON.stringify(projects));
     cloudQuiet = false;
   }
   const all = load('projects', []);
