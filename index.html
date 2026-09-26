@@ -453,8 +453,6 @@ textarea { resize:vertical; min-height:60px; }
     </div>
     <div id="nav-list" data-page-node-id="Ux7eKHBDBcFQXtCO1eq4Ll"></div>
     <div class="sidebar-foot">
-      <button type="button" class="sync-btn" onclick="openSync()">云端保存</button>
-      <div id="sync-status" class="sync-status">未连接</div>
       <div>🌷</div>
     </div>
   </nav>
@@ -468,22 +466,10 @@ textarea { resize:vertical; min-height:60px; }
         <div class="card-title">打开方式</div>
         <p>工作台需要在浏览器里运行。请不要只在编辑器里看这份 HTML 源代码。</p>
         <p style="margin-top:10px;color:var(--muted)">固定地址：</p>
-        <p style="margin-top:8px"><a href="https://coraliang01.github.io/cora-workbench/" style="color:var(--primary)">https://coraliang01.github.io/cora-workbench/</a></p>
+        <p style="margin-top:8px"><a href="https://coraliang01.github.io/cora-workbench-public/" style="color:var(--primary)">https://coraliang01.github.io/cora-workbench-public/</a></p>
       </div>
     </div>
   </main>
-</div>
-<div id="sync-modal" class="sync-modal" hidden>
-  <div class="sync-card">
-    <div class="card-title">把记录存到你的 GitHub</div>
-    <p>这个 token 能读写你的私人仓库，只填在自己的浏览器里。生成后勾选 <b>repo</b>。</p>
-    <p><a id="sync-token-link" href="https://github.com/settings/tokens/new?scopes=repo&description=Cora-workbench" target="_blank" rel="noopener" style="color:var(--primary)">生成一个 repo 权限的 token</a>，粘贴到下面。</p>
-    <input id="sync-token" type="password" placeholder="github_pat_ 或 ghp_ 开头的 token" autocomplete="off">
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button type="button" class="btn" onclick="closeSync()">取消</button>
-      <button type="button" class="btn btn-primary" onclick="connectSync()">连接并保存</button>
-    </div>
-  </div>
 </div>
 <div id="edit-modal" class="sync-modal" hidden>
   <div class="sync-card">
@@ -497,7 +483,7 @@ textarea { resize:vertical; min-height:60px; }
 </div>
 
 <script>
-const P = 'ww_';
+const P = 'wwdemo_';
 const NAV = [
   {id:'dashboard', icon:'🏠', label:'首页仪表盘'},
   {id:'ddl', icon:'⏰', label:'DDL 管理'},
@@ -567,8 +553,7 @@ function load(k, def){ try{ const v = JSON.parse(localStorage.getItem(P+k)); ret
 let cloudQuiet = false;
 let cloudSha = '';
 let cloudTimer = null;
-const DATA_REPO = 'CoraLiang01/cora-workbench-data';
-function ghToken(){ return localStorage.getItem(P+'gh_token') || ''; }
+function ghToken(){ return ''; }
 function save(k, v){
   try{
     localStorage.setItem(P+k, JSON.stringify(v));
@@ -622,9 +607,10 @@ function applyCloud(doc){
   cloudQuiet = false;
 }
 async function ghContents(method, body){
+  return null;
   const token = ghToken();
   if(!token) return null;
-  const res = await fetch('https://api.github.com/repos/'+DATA_REPO+'/contents/data.json', {
+  const res = await fetch('https://api.github.com/repos/demo/demo/contents/data.json', {
     method,
     headers:{
       Authorization:'Bearer '+token,
@@ -1258,7 +1244,7 @@ function mdLocal(src){
 function openFilesDB(){
   return new Promise((resolve,reject)=>{
     if(!window.indexedDB){ reject(new Error('no idb')); return; }
-    const req = indexedDB.open('ww_workbench_files', 1);
+    const req = indexedDB.open('wwdemo_workbench_files', 1);
     req.onupgradeneeded = ()=>{ const db=req.result; if(!db.objectStoreNames.contains('files')) db.createObjectStore('files'); };
     req.onsuccess = ()=> resolve(req.result);
     req.onerror = ()=> reject(req.error);
